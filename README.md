@@ -14,4 +14,25 @@ Run the ```mvn clean install``` in the project and generate the target folder
     * In above command we will be utilizing the ```spark-submit``` script provided to us by spark
     * Second parameter will be the ```--class com.kd.main.ReadToDataset``` which is the class we are going to execute. This class should have a main method implemented with the logic you want to excute
     * Third parameter is the jar file we want to execute ```~/git/spark/spark-test/spark-job/target/spark-job-1.0-SNAPSHOT.jar```
-    * Fourth parameter is the file we need to read in our script ```~/git/spark/spark-test/spark-job/inventory.csv```. This parameter will be accessed as arg[0] in the main class. if you have more than 1 parameter seperated by spaces and can be accessed in java program with arg[x] 
+    * Fourth parameter is the file we need to read in our script ```~/git/spark/spark-test/spark-job/inventory.csv```. This parameter will be accessed as arg[0] in the main class. if you have more than 1 parameter seperated by spaces and can be accessed in java program with arg[x]
+
+
+### Build Docker Image
+```dockerfile
+docker build -t spark-app .
+```
+
+### Run docker image
+```dockerfile
+docker run --rm spark-app
+```
+
+### Tag docker image
+```dockerfile
+docker tag spark-app niroshan009/spark-app
+```
+
+### docker push
+```dockerfile
+docker push niroshan009/spark-app
+```

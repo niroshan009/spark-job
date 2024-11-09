@@ -13,12 +13,12 @@ public class ReadToDataset {
     public static void main(String[] args) {
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
-        SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+        SparkConf conf = new SparkConf().setAppName("startingSpark");//.setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
         SQLContext sqlContext = new SQLContext(sc);
         SparkSession sparkSession = SparkSession.builder().appName("testsql").master("local[*]").config("spark.sql.warehouse.dir", "file:///~/tmp").getOrCreate();
 
-        Dataset<Row> inputData = sparkSession.read().option("header",true).csv(args[0]);
+        Dataset<Row> inputData = sparkSession.read().option("header",true).csv("/app/resources/inventory.csv");
 
         inputData.show();
     }
