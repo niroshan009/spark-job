@@ -19,7 +19,7 @@ Run the ```mvn clean install``` in the project and generate the target folder
 
 ### Build Docker Image
 ```dockerfile
-docker build -t spark-app .
+docker build -t spark-app . --load
 ```
 
 ### Run docker image
