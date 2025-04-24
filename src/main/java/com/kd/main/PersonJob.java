@@ -9,53 +9,43 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
 public class PersonJob {
 
 //    yLyiS0vaXeeZDnW9QvP9
 //    Swu0zOG7yLRWNbLaj4Y3aJKbsuuN2Z4VRaguhwdO
 
-    private static final String AWS_KEY = "yLyiS0vaXeeZDnW9QvP9";
-    private static final String AWS_SECRET_KEY = "Swu0zOG7yLRWNbLaj4Y3aJKbsuuN2Z4VRaguhwdO";
+    private static final String AWS_KEY = "GcpHcawcrlip6n2OTzRr";
+    private static final String AWS_SECRET_KEY = "DSywG5vYA3HpIl3X7DFVnbqaBL3XAQfa6RXkYkGg";
 
     public static void main(String[] args) throws NoSuchTableException {
         Logger.getLogger("org.apache").setLevel(Level.WARN);
         SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
 
-        JavaSparkContext sc = new JavaSparkContext(conf);
-//        SQLContext sqlContext = new SQLContext(sc);
-        SparkSession sparkSession = SparkSession.builder()
-                .appName("testsql")
-                .master("local[*]")
-                .config("spark.sql.warehouse.dir", "file:///~/tmp")
-                .config("spark.sql.extensions","org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-                .config("spark.sql.catalog.demo","org.apache.iceberg.spark.SparkCatalog")
-                .config("spark.sql.catalog.demo.type", "rest")
-                .config("spark.sql.catalog.demo.uri","http://127.0.0.1:8181")
-                .config("spark.sql.catalog.demo.io-impl","org.apache.iceberg.hadoop.HadoopFileIO")
-                .config("spark.sql.catalog.demo.warehouse","s3://warehouse/wh/")
-                .config("spark.sql.catalog.demo.s3.endpoint", "http://127.0.0.1:9000")
-                .config("spark.sql.defaultCatalog", "demo")
-                .config("spark.eventLog.enabled", "true")
+        SparkSession spark = SparkSession.builder()
+                .appName("JavaIcebergJob")
+                .master("local[*]") // remove this if you're running on a cluster
+                .config("spark.sql.catalog.demo", "org.apache.iceberg.spark.SparkCatalog")
+                .config("spark.sql.catalog.demo.type", "hadoop")
+                .config("spark.sql.catalog.demo.warehouse", "s3a://warehouse")
+                .config("spark.hadoop.fs.s3a.access.key", AWS_KEY)
+                .config("spark.hadoop.fs.s3a.secret.key", AWS_SECRET_KEY)
+                .config("spark.hadoop.fs.s3a.endpoint", "http://localhost:9000")
+
+                .config("spark.hadoop.fs.s3a.access.key", AWS_KEY)
+                .config("spark.hadoop.fs.s3a.secret.key", AWS_SECRET_KEY)
+                .config("spark.hadoop.fs.s3a.endpoint", "http://localhost:9000")
+                .config("spark.hadoop.fs.s3a.path.style.access", "true")
+                .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
                 .getOrCreate();
-        sparkSession.sparkContext().hadoopConfiguration().set("fs.s3a.endpoint", "http://localhost:9000");
-        sparkSession.sparkContext().hadoopConfiguration().set("fs.s3a.access.key", AWS_KEY);
-        sparkSession.sparkContext().hadoopConfiguration().set("fs.s3a.secret.key", AWS_SECRET_KEY);
-        sparkSession.sparkContext().hadoopConfiguration().set("fs.s3a.path.style.access", "true");
-        sparkSession.sparkContext().hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
 
 
+        spark.sql("CREATE TABLE demo.person.information_2 (id INT, name STRING) USING ICEBERG");
 
-//        input-files/person-information.csv
-        String input_path = "s3a://input-files/person-information.csv";
-        Dataset<Row> csvData = sparkSession.read()
-                .option("header", "true") // if your CSV has a header
-                .option("inferSchema", "true")
-                .csv(input_path);
 
-        csvData.show(false);
+        spark.sql("INSERT INTO demo.person.information_ VALUES (1, 'Alice', 'wonder', 'alice@gmail.com', 'female', '127.0.0.1')");
 
-        csvData.writeTo("tabular.your_namespace.your_table_name")
-                .append();
     }
 }
